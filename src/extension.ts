@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const { workspace } = vscode;
+const { workspace, Position, Range, TextEdit } = vscode;
 
 function init(): string[] {
 	const templateDir = path.join((workspace.rootPath as string), '.custom-template');
@@ -37,10 +37,56 @@ export function activate(context: vscode.ExtensionContext) {
 		template[t] = readTemplate(t);
 	});
 	
-	
+	const providers: vscode.Disposable[] = [];
 
-	console.log(template);
-	// context.subscriptions.push();
+	tmeps.forEach(t => {
+		const ext = path.extname(t);
+		console.log(`**/*${ext}`);
+		const provider = vscode.languages.registerCompletionItemProvider({ pattern:  `**/*.{ts,js}` }, {
+			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
+				const snippetCompletion = new vscode.CompletionItem(path.basename(t));
+
+				const start = new Position(position.line, position.character - 1);
+				const end = new Position(position.line, position.character);
+				const range = new Range(start, end);
+
+				const content = template[t];
+				snippetCompletion.additionalTextEdits = [TextEdit.delete(range)];
+				snippetCompletion.insertText = new vscode.SnippetString(content);
+				snippetCompletion.documentation = new vscode.MarkdownString(content);
+				return [
+					snippetCompletion
+				];
+			}
+		}, '~');
+
+		providers.push(provider);
+	});
+
+	
+	const provider2 = vscode.languages.registerCompletionItemProvider(
+		'plaintext',
+		{
+			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+
+				// get all text until the `position` and check if it reads `console.`
+				// and iff so then complete if `log`, `warn`, and `error`
+				let linePrefix = document.lineAt(position).text.substr(0, position.character);
+				if (!linePrefix.endsWith('console.')) {
+					return undefined;
+				}
+
+				return [
+					new vscode.CompletionItem('log', vscode.CompletionItemKind.Method),
+					new vscode.CompletionItem('warn', vscode.CompletionItemKind.Method),
+					new vscode.CompletionItem('error', vscode.CompletionItemKind.Method),
+				];
+			}
+		},
+		'.' // triggered whenever a '.' is being typed
+	);
+
+	context.subscriptions.push(...providers, provider2);
 }
 
 // this method is called when your extension is deactivated

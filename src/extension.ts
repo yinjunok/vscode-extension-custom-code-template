@@ -36,13 +36,13 @@ export function activate(context: vscode.ExtensionContext) {
 	tmeps.forEach(t => {
 		template[t] = readTemplate(t);
 	});
-	
+
 	const providers: vscode.Disposable[] = [];
 
 	tmeps.forEach(t => {
 		const ext = path.extname(t);
 		console.log(`**/*${ext}`);
-		const provider = vscode.languages.registerCompletionItemProvider({ pattern:  `**/*.{ts,js}` }, {
+		const provider = vscode.languages.registerCompletionItemProvider({ pattern: `**/*${ext}` }, {
 			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
 				const snippetCompletion = new vscode.CompletionItem(path.basename(t));
 
@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
 		providers.push(provider);
 	});
 
-	
+
 	const provider2 = vscode.languages.registerCompletionItemProvider(
 		'plaintext',
 		{
@@ -90,4 +90,4 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

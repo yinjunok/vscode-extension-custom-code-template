@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as utils from './utils';
 
 const {
@@ -21,19 +22,31 @@ interface ITemplate {
 class TemplateManger {
   private template: ITemplate = {};
   private subscriptions: vscode.Disposable[];
+  private tempDir: string = path.join((workspace.rootPath as string), '.custom-template');
 
   constructor(subs: vscode.Disposable[]) {
     this.subscriptions = subs;
   }
 
+  public run() {
+    const watchPath = path.join(this.tempDir, '*.*');
+    const watcher = vscode.workspace.createFileSystemWatcher(watchPath);
+    watcher.onDidCreate((e: vscode.Uri) => this.create(e.fsPath));
+    watcher.onDidChange((e: vscode.Uri) => this.change(e.fsPath));
+    watcher.onDidDelete((e: vscode.Uri) => this.delete(e.fsPath));
+
+    if (fs.existsSync(this.tempDir)) {
+      this.init();
+    }
+  }
+
   public async init() {
-    const templateDir = path.join((workspace.rootPath as string), '.custom-template');
-    const dirContent = await utils.readdirPromise(templateDir);
+    const dirContent = await utils.readdirPromise(this.tempDir);
     const files: string[] = [];
   
     // 判断是否为文件
     for (let i = 0; i < dirContent.length; ++i) {
-      const filePath = path.join(templateDir, dirContent[i]);
+      const filePath = path.join(this.tempDir, dirContent[i]);
       const state = await utils.statePromise(filePath);
       if (state.isFile()) {
         files.push(filePath);

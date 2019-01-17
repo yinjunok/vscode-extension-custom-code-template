@@ -6,6 +6,8 @@
 	"engines": {
 		"vscode": "^1.30.0"
 	},
+	"publisher": "yinjun",
+	"repository": "https://github.com/yinjunok/custom-code-template.git",
 	"categories": [
 		"Other"
 	],

@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
 	if (fs.existsSync(tempDirPath)) {
 		manager.init();
 	}
-	console.log('extension active');
+
 	const watchPath = path.join(vscode.workspace.rootPath as string, '.custom-template', '*.*');
 	const watcher = vscode.workspace.createFileSystemWatcher(watchPath);
 	watcher.onDidCreate((e: vscode.Uri) => manager.create(e.fsPath));

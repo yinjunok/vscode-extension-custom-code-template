@@ -24,8 +24,11 @@ export default DemoComponent;
 ## 使用方法
 
 1. 在项目根目录新建一个名为 `.custom-template` 存放模板代码的文件夹.
-2. 在文件夹里写相应语言的模板代码. 更强大的定制模板可以使用 SnippetString.   
-   相应文档: https://code.visualstudio.com/api/references/vscode-api#SnippetString
+2. 在文件夹里写相应语言的模板代码. 更强大的定制模板可以使用 [SnippetString](https://code.visualstudio.com/api/references/vscode-api#SnippetString). 
 3. 使用 `~` 激活模板填充. 本扩展使用了 AI 智能识别相应语言.
 
 ![示例2](./demo2.gif)
+
+## 小问题
+使用 [SnippetString](https://code.visualstudio.com/api/references/vscode-api#SnippetString) 时, vscode 会报语法错误, 尝试在设置里忽略 `.custom-template` 的语法检查, 没成功.
+这个不影响使用, 只是看起来有点不爽.
